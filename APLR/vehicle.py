@@ -13,8 +13,6 @@ class Vehicle:
         self.w = int(self.w * factor)
         self.h = int(self.h * factor)
 
-        self.c = self.c[0] * factor,self.c[1] * factor,
+        self.c = self.c[0] * factor, self.c[1] * factor,
 
         return self
-
-

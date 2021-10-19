@@ -5,11 +5,14 @@ import cv2 as cv
 import numpy as np
 import copy
 import pytesseract as ocr
-
-detected_plates = set()
 from APLR.frame_alpr import FrameAlpr
 from APLR.cvao import cvao
+
+detected_plates = set()
+
 l = 0
+
+
 def unsharp_mask(image, kernel_size=(5, 5), sigma=1.0, amount=1.0, threshold=0):
     """Return a sharpened version of the image, using an unsharp mask."""
     blurred = cv.GaussianBlur(image, kernel_size, sigma)
@@ -22,6 +25,7 @@ def unsharp_mask(image, kernel_size=(5, 5), sigma=1.0, amount=1.0, threshold=0):
         np.copyto(sharpened, image, where=low_contrast_mask)
     return sharpened
 
+
 def build_tesseract_options(psm=7):
     # tell Tesseract to only OCR alphanumeric characters
     alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -32,15 +36,14 @@ def build_tesseract_options(psm=7):
     options += " --psm {}".format(psm)
     options += " bazaar"
 
-
-
     # return the built options string
     return options
 
-path  = 'C:/Users/ramos/dev/videos/videos/Camera1'
+
+path = 'C:/Users/ramos/dev/videos/videos/Camera1'
 files = os.listdir(path)
 
-cap = cv.VideoCapture(path+files[0])
+cap = cv.VideoCapture(path + files[0])
 
 frame_width = int(cap.get(3))
 frame_height = int(cap.get(4))
@@ -49,8 +52,8 @@ size = (frame_width, frame_height)
 print(size)
 
 result = cv.VideoWriter('output.avi',
-                                cv.VideoWriter_fourcc(*'MJPG'),
-                                24, size)
+                        cv.VideoWriter_fourcc(*'MJPG'),
+                        24, size)
 
 frame_before = None
 a = 0
@@ -81,21 +84,17 @@ while cap.isOpened():
         output.scale_contours(1.5)
         output.draw_vehicles()
 
-
         for v in scaled_vehicles:
             bg = np.zeros(input.mat.shape, dtype="uint8")
 
-#            cv.rectangle(bg, (v.x, v.y), (v.x + v.w, v.y + v.h), 255, -1)
+            #            cv.rectangle(bg, (v.x, v.y), (v.x + v.w, v.y + v.h), 255, -1)
             plates = FrameAlpr(input.mat.copy())
-#            bitwiseAnd = cv.bitwise_and(bg, plates)
+            #            bitwiseAnd = cv.bitwise_and(bg, plates)
 
-            crop_img = plates.mat[v.y:v.y+v.h, v.x:v.x+v.w]
-
+            crop_img = plates.mat[v.y:v.y + v.h, v.x:v.x + v.w]
 
             crop_img_gray = cv.cvtColor(crop_img, cv.COLOR_BGR2GRAY)
-            candidates = cvao.locate_license_plate_candidates(crop_img_gray,)
-
-
+            candidates = cvao.locate_license_plate_candidates(crop_img_gray, )
 
             a = cvao.locate_license_plate(crop_img_gray, candidates)
             if a[0] is not None:
@@ -117,21 +116,15 @@ while cap.isOpened():
                         for i in range(48):
                             result.write(output.mat)
 
-
-
-
-
-
-           # cv.imshow('output', output.mat)
+        # cv.imshow('output', output.mat)
 
         #        cv.imshow('Original', dmy)
-#        cv.imshow('Diff', diff_image)
-#        cv.imshow('Dilated', dilated)
-#        cv.imshow('Thresh', thresh)
-        #cv.imshow('Median', median)
+        #        cv.imshow('Diff', diff_image)
+        #        cv.imshow('Dilated', dilated)
+        #        cv.imshow('Thresh', thresh)
+        # cv.imshow('Median', median)
 
-
-        #if cv.waitKey(1) & 0xFF == ord('s'):
+        # if cv.waitKey(1) & 0xFF == ord('s'):
         #    break
 
         result.write(output.mat)
@@ -139,7 +132,7 @@ while cap.isOpened():
         a = 1
         l += 1
         print(l)
-        if l == 24*60*1:
+        if l == 24 * 60 * 1:
             break
 
     else:
@@ -148,4 +141,3 @@ while cap.isOpened():
 cap.release()
 result.release()
 cv.destroyAllWindows()
-

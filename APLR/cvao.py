@@ -67,19 +67,16 @@ class cvao:
 
                 for v in vehicles:
                     if (cX > v.x and cX < (v.x + v.w)) and (cY > v.y and cY < (v.y + v.h)):
-                        if v.w * v.h > h*w:
+                        if v.w * v.h > h * w:
                             invalid = True
 
                 if not invalid:
                     valid_cntrs.append(cntr)
                     vehicles.append(Vehicle(x, y, w, h, (cX, cY)))
 
-
         frame.contours = valid_cntrs
         frame.vehicles = vehicles
         return frame
-
-
 
     @staticmethod
     def locate_license_plate_candidates(gray, keep=5, debug=False):
@@ -88,7 +85,6 @@ class cvao:
         blackhat = cv.morphologyEx(gray, cv.MORPH_BLACKHAT, rectKern)
         if debug:
             FrameAlpr(blackhat).debug_imshow("Blackhat", True)
-
 
         squareKern = cv.getStructuringElement(cv.MORPH_RECT, (3, 3))
         light = cv.morphologyEx(gray, cv.MORPH_CLOSE, squareKern)
@@ -112,16 +108,13 @@ class cvao:
         if debug:
             FrameAlpr(thresh).debug_imshow("Grad Thresh", True)
 
-
         thresh = cv.erode(thresh, None, iterations=2)
         thresh = cv.dilate(thresh, None, iterations=2)
         if debug:
             FrameAlpr(thresh).debug_imshow("Grad Erode/Dilate", True)
 
-
         if debug:
             FrameAlpr(thresh).debug_imshow("Final", waitKey=True)
-
 
         cnts = cv.findContours(thresh.copy(), cv.RETR_EXTERNAL,
                                cv.CHAIN_APPROX_SIMPLE)
